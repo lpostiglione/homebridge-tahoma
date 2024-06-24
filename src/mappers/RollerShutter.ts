@@ -61,6 +61,7 @@ export default class RollerShutter extends Mapper {
     * Triggered when Homekit try to modify the Characteristic.TargetPosition
     * HomeKit '0' (Close) => 0% Deployment
     * HomeKit '100' (Open) => 100% Deployment
+    * HomeKit '99' or '1' => "my" Position
     **/
     protected getTargetCommands(value): Command | Command[] {
         if (this.stateless) {
@@ -68,6 +69,8 @@ export default class RollerShutter extends Mapper {
                 return new Command(this.reverse ? 'close' : 'open');
             } else if (value === 0) {
                 return new Command(this.reverse ? 'open' : 'close');
+            } else if ((value === 1 && !this.reverse) || (value === 99 && this.reverse)) {
+                return new Command('my');
             } else {
                 if (this.movementDuration > 0) {
                     const delta = value - Number(this.currentPosition!.value);
